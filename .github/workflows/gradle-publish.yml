@@ -29,5 +29,6 @@ jobs:
       - name: Publish to GitHub Packages
         run: ./gradlew publish
         env:
+          BUILD_NUMBER: ${{ github.run_number }}
           IREPO_USERNAME: ${{ secrets.IREPO_USERNAME }}
           IREPO_PASSWORD: ${{ secrets.IREPO_PASSWORD }}
