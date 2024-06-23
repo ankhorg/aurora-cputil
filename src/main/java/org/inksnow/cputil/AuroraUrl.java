@@ -13,12 +13,11 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 public final class AuroraUrl {
+  private static Map<String, AuroraUrlHandler> handlers = null;
+  private static final URLStreamHandler auroraHandler = new AuroraUrlHandlerImpl();
   private AuroraUrl() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
   }
-
-  private static Map<String, AuroraUrlHandler> handlers = null;
-  private static URLStreamHandler auroraHandler = new AuroraUrlHandlerImpl();
 
   private static Map<String, AuroraUrlHandler> handlers() {
     Map<String, AuroraUrlHandler> handlers = AuroraUrl.handlers;

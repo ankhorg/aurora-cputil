@@ -2,10 +2,13 @@ package org.inksnow.cputil.db.h2;
 
 import org.inksnow.cputil.download.DownloadEntry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class H2v2Database extends AbstractH2Database {
-  private static final List<DownloadEntry> DOWNLOAD_ENTRIES = new ArrayList<>(Arrays.asList(
+  private static final List<DownloadEntry> DOWNLOAD_ENTRIES = new ArrayList<>(Collections.singletonList(
       new DownloadEntry(
           "com/h2database/h2/2.2.224/h2-2.2.224.jar",
           "https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar",

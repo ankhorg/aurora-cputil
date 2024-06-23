@@ -95,6 +95,7 @@ public final class AuroraDownloader {
           new LinkedBlockingQueue<>(),
           new ThreadFactory() {
             private int count = 0;
+
             @Override
             public Thread newThread(Runnable runnable) {
               Thread thread = new Thread(runnable);

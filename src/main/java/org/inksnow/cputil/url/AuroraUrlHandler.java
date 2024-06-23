@@ -6,6 +6,8 @@ import java.net.URLConnection;
 
 public interface AuroraUrlHandler {
   String name();
+
   URLConnection openConnection(String url) throws IOException;
+
   InputStream openStream(String url) throws IOException;
 }

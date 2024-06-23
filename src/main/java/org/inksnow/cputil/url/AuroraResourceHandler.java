@@ -33,6 +33,7 @@ public class AuroraResourceHandler implements AuroraUrlHandler {
 
   public class NoUrlResourceConnection extends URLConnection {
     private final String urlString;
+
     protected NoUrlResourceConnection(String urlString) throws MalformedURLException {
       super(new URL("aurora", null, -1, urlString, AuroraUrl.auroraHandler()));
       this.urlString = urlString;

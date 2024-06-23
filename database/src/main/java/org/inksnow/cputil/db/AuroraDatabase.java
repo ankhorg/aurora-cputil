@@ -2,9 +2,9 @@ package org.inksnow.cputil.db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.inksnow.cputil.*;
+import org.inksnow.cputil.AuroraCputil;
+import org.inksnow.cputil.AuroraDownloader;
 import org.inksnow.cputil.classloader.AuroraClassLoader;
-import org.inksnow.cputil.download.DownloadEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +13,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Driver;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -84,7 +83,7 @@ public class AuroraDatabase extends HikariDataSource {
 
     private AuroraClassLoader createClassLoader(List<Path> classpathEntries) {
       return AuroraClassLoader.builder()
-          .urls(classpathEntries.stream().map(it-> {
+          .urls(classpathEntries.stream().map(it -> {
             try {
               return it.toUri().toURL();
             } catch (MalformedURLException e) {

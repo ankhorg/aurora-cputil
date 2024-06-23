@@ -11,6 +11,12 @@ public enum LoadPolicy {
   private final boolean parentThen;
   private final boolean selfLast;
 
+  LoadPolicy(boolean selfFirst, boolean parentThen, boolean selfLast) {
+    this.selfFirst = selfFirst;
+    this.parentThen = parentThen;
+    this.selfLast = selfLast;
+  }
+
   public boolean selfFirst() {
     return selfFirst;
   }
@@ -21,11 +27,5 @@ public enum LoadPolicy {
 
   public boolean selfLast() {
     return selfLast;
-  }
-
-  LoadPolicy(boolean selfFirst, boolean parentThen, boolean selfLast) {
-    this.selfFirst = selfFirst;
-    this.parentThen = parentThen;
-    this.selfLast = selfLast;
   }
 }

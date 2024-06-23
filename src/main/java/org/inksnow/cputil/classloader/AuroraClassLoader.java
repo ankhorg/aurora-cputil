@@ -15,6 +15,10 @@ public class AuroraClassLoader extends URLClassLoader {
     this.loadPolicies = loadPolicies;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public LoadPolicy getLoadPolicy(String name) {
     while (name.startsWith("/")) {
       name = name.substring(1);
@@ -155,17 +159,11 @@ public class AuroraClassLoader extends URLClassLoader {
     }
   }
 
-  public static Builder builder() {
-    return new Builder();
-  }
-
   public static final class Builder {
+    private final Map<String, LoadPolicy> loadPolicies = new LinkedHashMap<>();
     private List<URL> urls;
     private ClassLoader parent;
     private URLStreamHandlerFactory factory;
-
-    private final Map<String, LoadPolicy> loadPolicies = new LinkedHashMap<>();
-
 
     public Builder url(URL url) {
       if (this.urls == null) {
@@ -187,7 +185,7 @@ public class AuroraClassLoader extends URLClassLoader {
       return this;
     }
 
-    public Builder urls(URL ... urls) {
+    public Builder urls(URL... urls) {
       if (this.urls == null) {
         this.urls = new ArrayList<>();
       }
