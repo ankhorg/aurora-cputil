@@ -25,6 +25,8 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
 
       - name: Publish to GitHub Packages
         run: ./gradlew publish
