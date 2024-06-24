@@ -61,5 +61,6 @@ allprojects {
 }
 
 dependencies {
+    api("org.ow2.asm:asm:9.7")
     api("org.slf4j:slf4j-api:1.7.36")
 }

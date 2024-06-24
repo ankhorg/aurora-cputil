@@ -92,6 +92,7 @@ public class AuroraDatabase extends HikariDataSource {
           }).collect(Collectors.toList()))
           .parent(AuroraCputil.contextClassLoader())
           .loadPolicies(databaseType.loadPolicies())
+          .transformers(databaseType.transformers())
           .build();
     }
 

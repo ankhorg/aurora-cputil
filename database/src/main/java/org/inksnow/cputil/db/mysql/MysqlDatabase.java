@@ -2,13 +2,16 @@ package org.inksnow.cputil.db.mysql;
 
 import org.inksnow.cputil.classloader.LoadPolicy;
 import org.inksnow.cputil.db.Database;
+import org.inksnow.cputil.db.transform.DisableRegisterDriverTransformer;
 import org.inksnow.cputil.download.DownloadEntry;
+import org.inksnow.cputil.transform.Transformer;
 
 import java.util.*;
 
 public class MysqlDatabase implements Database {
   private static final String DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
   private static final Map<String, LoadPolicy> LOAD_POLICIES = createLoadPolicies();
+  private static final Map<String, List<Transformer>> TRANSFORMERS = createTransformers();
   private static final List<DownloadEntry> DOWNLOAD_ENTRIES = new ArrayList<>(Arrays.asList(
       new DownloadEntry(
           "com/mysql/mysql-connector-j/8.4.0/mysql-connector-j-8.4.0.jar",
@@ -30,6 +33,12 @@ public class MysqlDatabase implements Database {
     return Collections.unmodifiableMap(loadPolicies);
   }
 
+  private static Map<String, List<Transformer>> createTransformers() {
+    Map<String, List<Transformer>> transformers = new HashMap<>();
+    transformers.put("com/mysql/cj/jdbc/Driver", Collections.singletonList(new DisableRegisterDriverTransformer()));
+    return Collections.unmodifiableMap(transformers);
+  }
+
   @Override
   public String name() {
     return "mysql";
@@ -43,6 +52,11 @@ public class MysqlDatabase implements Database {
   @Override
   public Map<String, LoadPolicy> loadPolicies() {
     return LOAD_POLICIES;
+  }
+
+  @Override
+  public Map<String, List<Transformer>> transformers() {
+    return TRANSFORMERS;
   }
 
   @Override
