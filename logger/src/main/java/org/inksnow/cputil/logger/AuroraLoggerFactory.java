@@ -6,10 +6,13 @@ import org.inksnow.cputil.logger.impl.parent.AuroraParentLogger;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
+import java.util.function.Function;
+
 public class AuroraLoggerFactory implements ILoggerFactory {
   private static AuroraLoggerFactory INSTANCE;
 
   private ILoggerFactory provider;
+  private Function<String, String> nameMapping;
   private int currentVersion = 0;
 
   public AuroraLoggerFactory() {
@@ -17,6 +20,7 @@ public class AuroraLoggerFactory implements ILoggerFactory {
       throw new IllegalStateException("AuroraLoggerFactory is a singleton");
     }
     INSTANCE = this;
+    this.nameMapping = Function.identity();
     this.provider = selectDefaultProvider();
   }
 
@@ -45,9 +49,24 @@ public class AuroraLoggerFactory implements ILoggerFactory {
     return new JulLoggerFactory();
   }
 
-  public void setProvider(ILoggerFactory provider) {
+  public ILoggerFactory provider() {
+    return provider;
+  }
+
+  public void provider(ILoggerFactory provider) {
     if (this.provider != provider) {
       this.provider = provider;
+      currentVersion++;
+    }
+  }
+
+  public Function<String, String> nameMapping() {
+    return nameMapping;
+  }
+
+  public void nameMapping(Function<String, String> nameMapping) {
+    if (this.nameMapping != nameMapping) {
+      this.nameMapping = nameMapping;
       currentVersion++;
     }
   }
@@ -57,9 +76,9 @@ public class AuroraLoggerFactory implements ILoggerFactory {
     return new AuroraLogger(this, name);
   }
 
-  public Logger updateDelegate(AuroraLogger auroraLogger) {
+  /* package-private */ Logger updateDelegate(AuroraLogger auroraLogger) {
     if (auroraLogger.version != currentVersion) {
-      Logger newLogger = provider.getLogger(auroraLogger.name);
+      Logger newLogger = provider.getLogger(nameMapping.apply(auroraLogger.name));
       auroraLogger.version = currentVersion;
       auroraLogger.delegate = newLogger;
       return newLogger;

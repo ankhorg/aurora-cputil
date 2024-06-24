@@ -26,7 +26,7 @@ public class AuroraLogger implements Logger {
 
   @Override
   public String getName() {
-    return delegate().getName();
+    return name;
   }
 
   @Override
