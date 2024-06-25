@@ -17,10 +17,10 @@ import java.security.ProtectionDomain;
 import java.util.function.Function;
 
 public class AuroraParentLogger implements ILoggerFactory {
-  public static final String PARENT_PACKAGE_NAME = new String(new char[]{
+  public static final boolean DEFAULT_ENABLE_MARKER = false;
+  public static final String DEFAULT_PARENT_PACKAGE_NAME = new String(new char[]{
       'o', 'r', 'g', '.', 's', 'l', 'f', '4', 'j'
   });
-  public static final String PARENT_INTERNAL_NAME = PARENT_PACKAGE_NAME.replace('.', '/');
 
   public static final String SLF4J_PACKAGE_NAME = AuroraLogger.SLF4J_PACKAGE_NAME;
   public static final String SLF4J_INTERNAL_NAME = SLF4J_PACKAGE_NAME.replace('.', '/');
@@ -31,22 +31,34 @@ public class AuroraParentLogger implements ILoggerFactory {
   private static final String LOGGER_PROXY_FACTORY_CLASS_NAME = SLF4J_PACKAGE_NAME + ".generated.LoggerProxyFactory";
   private static final String LOGGER_PROXY_FACTORY_INTERNAL_NAME = LOGGER_PROXY_FACTORY_CLASS_NAME.replace('.', '/');
 
+  private final String parentPackageName;
+  private final String parentInternalName;
+
   private final boolean enableMarker;
   private final AuroraClassLoader classLoader;
   private final Function<String, Logger> loggerFunction;
 
+  public AuroraParentLogger() {
+    this(DEFAULT_ENABLE_MARKER, DEFAULT_PARENT_PACKAGE_NAME);
+  }
+
   public AuroraParentLogger(boolean enableMarker) {
+    this(enableMarker, DEFAULT_PARENT_PACKAGE_NAME);
+  }
+
+  public AuroraParentLogger(String parentPackageName) {
+    this(DEFAULT_ENABLE_MARKER, parentPackageName);
+  }
+
+  public AuroraParentLogger(boolean enableMarker, String parentPackageName) {
     this.enableMarker = enableMarker;
+    this.parentPackageName = parentPackageName;
+    this.parentInternalName = parentPackageName.replace('.', '/');
     this.classLoader = AuroraClassLoader.builder()
         .parent(Logger.class.getClassLoader())
         .build();
 
     byte[] loggerProxyClassBytes = generateLoggerProxy(classLoader);
-    try {
-      Files.write(Paths.get("LoggerProxy.class"), loggerProxyClassBytes);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
     Class<?> loggerClass = classLoader.defineClass0(LOGGER_PROXY_CLASS_NAME, loggerProxyClassBytes, 0, loggerProxyClassBytes.length, (ProtectionDomain) null);
 
     byte[] loggerProxyFactoryClassBytes = generateLoggerFactory(classLoader);
@@ -64,11 +76,11 @@ public class AuroraParentLogger implements ILoggerFactory {
   }
 
   public boolean isAvailable() {
-    if (PARENT_PACKAGE_NAME.equals(SLF4J_PACKAGE_NAME)) {
+    if (parentPackageName.equals(SLF4J_PACKAGE_NAME)) {
       return false;
     }
     try {
-      Class.forName(PARENT_PACKAGE_NAME + ".Logger", false, Logger.class.getClassLoader());
+      Class.forName(parentPackageName + ".Logger", false, Logger.class.getClassLoader());
     } catch (ClassNotFoundException e) {
       return false;
     }
@@ -76,7 +88,7 @@ public class AuroraParentLogger implements ILoggerFactory {
   }
 
   private byte[] generateLoggerProxy(AuroraClassLoader classLoader) {
-    String parentLoggerName = PARENT_INTERNAL_NAME + "/Logger";
+    String parentLoggerName = parentInternalName + "/Logger";
 
     ClassWriter cw = new SafeClassWriter(classLoader, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
     cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, LOGGER_PROXY_INTERNAL_NAME, null, "java/lang/Object",
@@ -120,8 +132,8 @@ public class AuroraParentLogger implements ILoggerFactory {
         if (argumentType.getSort() == Type.OBJECT && argumentType.getInternalName().equals(SLF4J_INTERNAL_NAME + "/Marker")) {
           if (enableMarker) {
             mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, SLF4J_INTERNAL_NAME + "/Marker", "getName", "()Ljava/lang/String;", true);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, PARENT_INTERNAL_NAME + "/MarkerFactory", "getMarker", "(Ljava/lang/String;)L" + PARENT_INTERNAL_NAME + "/Marker;", false);
-            methodDescriptor.append("L").append(PARENT_INTERNAL_NAME).append("/Marker;");
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, parentInternalName + "/MarkerFactory", "getMarker", "(Ljava/lang/String;)L" + parentInternalName + "/Marker;", false);
+            methodDescriptor.append("L").append(parentInternalName).append("/Marker;");
           } else {
             variableIndex++;
           }
@@ -166,8 +178,8 @@ public class AuroraParentLogger implements ILoggerFactory {
       mv.visitInsn(Opcodes.DUP);
       mv.visitVarInsn(Opcodes.ALOAD, 1);
       mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
-      mv.visitMethodInsn(Opcodes.INVOKESTATIC, PARENT_INTERNAL_NAME + "/LoggerFactory", "getLogger", "(Ljava/lang/String;)L" + PARENT_INTERNAL_NAME + "/Logger;", false);
-      mv.visitMethodInsn(Opcodes.INVOKESPECIAL, LOGGER_PROXY_INTERNAL_NAME, "<init>", "(L" + PARENT_INTERNAL_NAME + "/Logger;)V", false);
+      mv.visitMethodInsn(Opcodes.INVOKESTATIC, parentInternalName + "/LoggerFactory", "getLogger", "(Ljava/lang/String;)L" + parentInternalName + "/Logger;", false);
+      mv.visitMethodInsn(Opcodes.INVOKESPECIAL, LOGGER_PROXY_INTERNAL_NAME, "<init>", "(L" + parentInternalName + "/Logger;)V", false);
       mv.visitInsn(Opcodes.ARETURN);
       mv.visitMaxs(0, 0);
       mv.visitEnd();

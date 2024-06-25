@@ -33,7 +33,7 @@ public class AuroraLoggerFactory implements ILoggerFactory {
       Class.forName(AuroraLogger.UNMAPPED_SLF4J_PACKAGE_NAME + ".Logger", false, Logger.class.getClassLoader());
 
       if (!Logger.class.getName().equals(AuroraLogger.UNMAPPED_SLF4J_PACKAGE_NAME + ".Logger")) {
-        return new AuroraParentLogger(false);
+        return new AuroraParentLogger();
       }
     } catch (ClassNotFoundException e) {
       //
