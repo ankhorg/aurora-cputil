@@ -15,17 +15,23 @@ public class AuroraLoggerFactory implements ILoggerFactory {
   private Function<String, String> nameMapping;
   private int currentVersion = 0;
 
-  public AuroraLoggerFactory() {
-    if (INSTANCE != null) {
-      throw new IllegalStateException("AuroraLoggerFactory is a singleton");
-    }
-    INSTANCE = this;
+  private AuroraLoggerFactory() {
     this.nameMapping = Function.identity();
     this.provider = selectDefaultProvider();
   }
 
   public static AuroraLoggerFactory instance() {
-    return INSTANCE;
+    AuroraLoggerFactory instance = INSTANCE;
+    if (instance == null) {
+      synchronized (AuroraLoggerFactory.class) {
+        instance = INSTANCE;
+        if (instance == null) {
+          instance = new AuroraLoggerFactory();
+          INSTANCE = instance;
+        }
+      }
+    }
+    return instance;
   }
 
   private ILoggerFactory selectDefaultProvider() {
