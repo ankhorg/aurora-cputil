@@ -594,6 +594,8 @@ public class AuroraClassLoader extends URLClassLoader {
     private static MethodHandle createGetDataErrorImpl() {
       try {
         return UnsafeUtil.lookup().findVirtual(RESOURCE_CLASS, "getDataError", MethodType.methodType(Exception.class));
+      } catch (NoSuchMethodException e) {
+        return null;
       } catch (Throwable e) {
         return UnsafeUtil.unsafeThrow(e);
       }
@@ -605,7 +607,11 @@ public class AuroraClassLoader extends URLClassLoader {
 
     public Exception getDataError() {
       try {
-        return (Exception) GET_DATA_ERROR.invoke(resource);
+        if (GET_DATA_ERROR == null) {
+          return null;
+        } else {
+          return (Exception) GET_DATA_ERROR.invoke(resource);
+        }
       } catch (Throwable e) {
         return UnsafeUtil.unsafeThrow(e);
       }
