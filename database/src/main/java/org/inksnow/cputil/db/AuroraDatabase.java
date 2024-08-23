@@ -5,6 +5,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.inksnow.cputil.AuroraCputil;
 import org.inksnow.cputil.AuroraDownloader;
 import org.inksnow.cputil.classloader.AuroraClassLoader;
+import org.inksnow.cputil.classloader.LoadPolicy;
+import org.inksnow.cputil.db.transform.RedirectSlf4jTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +107,9 @@ public class AuroraDatabase extends HikariDataSource {
           }).collect(Collectors.toList()))
           .parent(AuroraCputil.contextClassLoader())
           .loadPolicies(databaseType.loadPolicies())
+          .loadPolicy(RedirectSlf4jTransformer.SLF4J_PACKAGE_NAME.replace('.', '/'), LoadPolicy.PARENT_ONLY)
           .transformers(databaseType.transformers())
+          .transformer("", new RedirectSlf4jTransformer())
           .build();
     }
 
