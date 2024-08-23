@@ -13,8 +13,10 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Driver;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class AuroraDatabase extends HikariDataSource {
@@ -32,6 +34,8 @@ public class AuroraDatabase extends HikariDataSource {
 
   public static final class Builder {
     private static final Path DEFAULT_CACHE_DIRECTORY = Paths.get("plugins", ".aurora", "cache");
+    private final List<Consumer<HikariConfig>> extensions = new ArrayList<>();
+
     private Path cacheDirectory = DEFAULT_CACHE_DIRECTORY;
     private String jdbcUrl;
     private Properties driverProperties = new Properties();
@@ -72,6 +76,15 @@ public class AuroraDatabase extends HikariDataSource {
       return this;
     }
 
+    public Builder extension(Consumer<HikariConfig> extension) {
+      extensions.add(extension);
+      return this;
+    }
+
+    public Builder clearExtensions() {
+      extensions.clear();
+      return this;
+    }
 
     private List<Path> downloadDriverClasses() throws IOException {
       if (databaseType == null) {
@@ -112,6 +125,7 @@ public class AuroraDatabase extends HikariDataSource {
       config.setPassword(driverProperties.getProperty(PASSWORD));
       config.setMaximumPoolSize(Math.min(4, Runtime.getRuntime().availableProcessors() * 2));
       config.setPoolName("aurora-pool");
+      extensions.forEach(it -> it.accept(config));
       return config;
     }
 
