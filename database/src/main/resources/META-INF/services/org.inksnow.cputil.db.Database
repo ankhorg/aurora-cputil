@@ -4,3 +4,4 @@ org.inksnow.cputil.db.h2.H2v2Database
 
 org.inksnow.cputil.db.mysql.MysqlDatabase
 org.inksnow.cputil.db.mariadb.MariadbDatabase
+org.inksnow.cputil.db.postgres.PostgresqlDatabase
