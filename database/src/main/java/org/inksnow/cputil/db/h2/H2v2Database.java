@@ -8,13 +8,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class H2v2Database extends AbstractH2Database {
-  private static final List<DownloadEntry> DOWNLOAD_ENTRIES = new ArrayList<>(Collections.singletonList(
+  private static final List<DownloadEntry> DOWNLOAD_ENTRIES = Collections.singletonList(
       new DownloadEntry(
           "com/h2database/h2/2.2.224/h2-2.2.224.jar",
           "https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar",
           "b9d8f19358ada82a4f6eb5b174c6cfe320a375b5a9cb5a4fe456d623e6e55497"
       )
-  ));
+  );
 
   @Override
   public String name() {
