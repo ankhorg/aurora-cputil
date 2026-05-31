@@ -510,7 +510,10 @@ public class AuroraClassLoader extends URLClassLoader {
 
   private static final class UcpAccessor {
     private static final MethodHandle GET_RESOURCE_STRING_BOOLEAN = createGetResourceImpl();
-    private static final boolean JAVA_25_OR_HIGHER = GET_RESOURCE_STRING_BOOLEAN.type().parameterCount() == 1;
+    // MethodHandle.parameterCount() includes the receiver, so the single-arg getResource(String)
+    // handle (used on JDK 25+, where the 2-arg overload was removed) has parameterCount() == 2,
+    // and the 2-arg getResource(String, boolean) handle has parameterCount() == 3.
+    private static final boolean JAVA_25_OR_HIGHER = GET_RESOURCE_STRING_BOOLEAN.type().parameterCount() == 2;
     private final Object ucp;
 
     public UcpAccessor(Object ucp) {
